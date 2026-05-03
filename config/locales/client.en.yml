@@ -1,0 +1,8 @@
+en:
+  js:
+    westan_ranking:
+      title: "Ranking Semanal"
+  admin_js:
+    site_settings:
+      categories:
+        discourse_westan_ranking: "Westan Ranking"

@@ -1,0 +1,4 @@
+en:
+  site_settings:
+    westan_ranking_enabled: "Enable the Westan weekly ranking."
+    westan_ranking_vip_group: "Group whose members receive the VIP score multiplier in /ranking."

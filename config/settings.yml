@@ -1,0 +1,9 @@
+plugins:
+  westan_ranking_enabled:
+    default: true
+    client: true
+
+  westan_ranking_vip_group:
+    default: ""
+    type: group
+    description: "Group whose members receive the VIP score multiplier in /ranking."
