@@ -31,6 +31,13 @@ export default class WestanRankingBoard extends Component {
     return this.rows.length > 0;
   }
 
+  get displayRows() {
+    return this.rows.map((row, index) => ({
+      ...row,
+      is_winner: index === 0,
+    }));
+  }
+
   get userResultRows() {
     return this.userResults.map((user) => ({
       ...user,
@@ -174,13 +181,13 @@ export default class WestanRankingBoard extends Component {
       </div>
 
       {{#if this.hasRows}}
-        {{#each this.rows as |row index|}}
+        {{#each this.displayRows as |row|}}
           <article class="westan-ranking-row">
             <div class="westan-ranking-position">#{{row.position}}</div>
             <div class="westan-ranking-user">
               <div class="westan-ranking-avatar">
                 <img src={{row.avatar_url}} alt={{row.display_name}} />
-                {{#if (eq index 0)}}
+                {{#if row.is_winner}}
                   <span>{{dIcon "crown"}}</span>
                 {{/if}}
               </div>
