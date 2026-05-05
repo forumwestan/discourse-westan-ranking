@@ -235,6 +235,10 @@
   color: #f28a00;
 }
 
+.westan-ranking-mobile-metrics {
+  display: none;
+}
+
 .westan-ranking-empty {
   padding: 56px 24px;
   color: #98a2b3;
@@ -559,12 +563,12 @@ body[class*="dark"] .westan-ranking-shell {
 
   .westan-ranking-row {
     display: grid;
-    grid-template-columns: 40px minmax(0, 1fr) 58px;
+    grid-template-columns: 48px minmax(0, 1fr) 64px;
     min-height: 0;
-    column-gap: 10px;
+    column-gap: 12px;
     row-gap: 14px;
     margin-bottom: 10px;
-    padding: 14px 12px 12px;
+    padding: 14px 16px 12px;
     border: 1px solid #eef0f3;
     border-radius: 22px;
     background: #fff;
@@ -574,6 +578,7 @@ body[class*="dark"] .westan-ranking-shell {
     width: 40px;
     height: 40px;
     align-self: start;
+    justify-self: start;
     border-radius: 14px;
     font-size: 0.82rem;
   }
@@ -582,7 +587,8 @@ body[class*="dark"] .westan-ranking-shell {
     grid-column: 3;
     grid-row: 1;
     align-self: start;
-    min-width: 58px;
+    justify-self: end;
+    min-width: 64px;
     min-height: 40px;
     padding: 6px 8px;
     border-radius: 14px;
@@ -624,24 +630,7 @@ body[class*="dark"] .westan-ranking-shell {
   }
 
   .westan-ranking-pill:not(.westan-ranking-pill--points) {
-    min-height: 42px;
-    padding: 7px 8px;
-  }
-
-  .westan-ranking-row > .westan-ranking-pill:not(.westan-ranking-pill--points) {
-    grid-row: 2;
-  }
-
-  .westan-ranking-row > .westan-ranking-pill:nth-of-type(3) {
-    grid-column: 1;
-  }
-
-  .westan-ranking-row > .westan-ranking-pill:nth-of-type(4) {
-    grid-column: 2;
-  }
-
-  .westan-ranking-pill--vip {
-    grid-column: 3;
+    display: none;
   }
 
   .westan-ranking-pill strong,
@@ -653,6 +642,57 @@ body[class*="dark"] .westan-ranking-shell {
   .westan-ranking-pill--points small {
     font-size: 0.48rem;
     letter-spacing: 0.1em;
+  }
+
+  .westan-ranking-mobile-metrics {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    padding: 10px;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+
+    div {
+      min-height: 42px;
+      padding: 8px 6px 6px;
+      border-radius: 12px;
+      background: #f8f9fb;
+      color: #050505;
+      text-align: center;
+      font-weight: 950;
+    }
+
+    strong,
+    small {
+      display: block;
+      line-height: 1;
+    }
+
+    strong {
+      font-size: 0.9rem;
+    }
+
+    small {
+      margin-top: 6px;
+      color: #98a2b3;
+      font-size: 0.48rem;
+      font-weight: 950;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .is-vip {
+      background: #fff0ff;
+      color: #d20ce3;
+
+      small {
+        color: #d20ce3;
+        letter-spacing: 0;
+        text-transform: none;
+      }
+    }
   }
 
   .westan-ranking-settings__grid,
@@ -812,6 +852,29 @@ body[class*="dark"] .westan-ranking-shell,
   .westan-ranking-pill--vip {
     background: #fff0ff;
     color: #d20ce3;
+  }
+
+  .westan-ranking-mobile-metrics {
+    background: #ffffff;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+
+    div {
+      background: #f8f9fb;
+      color: #050505;
+    }
+
+    small {
+      color: #98a2b3;
+    }
+
+    .is-vip {
+      background: #fff0ff;
+      color: #d20ce3;
+
+      small {
+        color: #d20ce3;
+      }
+    }
   }
 
   .westan-ranking-settings input,

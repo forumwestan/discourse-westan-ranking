@@ -206,6 +206,20 @@ export default class WestanRankingBoard extends Component {
               <strong>{{row.total_points}}</strong>
               <small>{{row.base_points}} base</small>
             </div>
+            <div class="westan-ranking-mobile-metrics">
+              <div>
+                <strong>{{row.posts_count}}</strong>
+                <small>Posts</small>
+              </div>
+              <div>
+                <strong>{{row.topics_count}}</strong>
+                <small>Tópicos</small>
+              </div>
+              <div class="is-vip">
+                <strong>x{{row.vip_multiplier}}</strong>
+                <small>{{if row.is_vip "VIP ativo" "Padrão"}}</small>
+              </div>
+            </div>
           </article>
         {{/each}}
       {{else}}
