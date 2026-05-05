@@ -503,16 +503,49 @@ body[class*="dark"] .westan-ranking-shell {
 }
 
 @media (max-width: 820px) {
+  .westan-ranking-shell {
+    padding: 24px 8px 48px;
+  }
+
   .westan-ranking-hero {
+    padding: 18px;
     border-radius: 26px;
+
+    h1 {
+      max-width: 190px;
+      font-size: 1.47rem;
+      line-height: 1.04;
+    }
+
+    > p {
+      font-size: 0.62rem;
+      letter-spacing: 0.42em;
+    }
   }
 
   .westan-ranking-hero__topline {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
   }
 
   .westan-ranking-hero__actions {
-    padding-top: 18px;
+    flex: 0 0 auto;
+    gap: 8px;
+    justify-content: flex-start;
+    padding-top: 0;
+  }
+
+  .westan-ranking-icon-button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .westan-ranking-hero__meta {
+    margin-top: 18px;
+    font-size: 0.78rem;
+    line-height: 1.25;
   }
 
   .westan-ranking-table {
@@ -526,18 +559,23 @@ body[class*="dark"] .westan-ranking-shell {
 
   .westan-ranking-row {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: 40px minmax(0, 1fr) 58px;
     min-height: 0;
-    gap: 12px;
-    margin-bottom: 12px;
-    padding: 16px;
+    column-gap: 10px;
+    row-gap: 14px;
+    margin-bottom: 10px;
+    padding: 14px 12px 12px;
     border: 1px solid #eef0f3;
-    border-radius: 24px;
+    border-radius: 22px;
     background: #fff;
   }
 
   .westan-ranking-position {
+    width: 40px;
+    height: 40px;
     align-self: start;
+    border-radius: 14px;
+    font-size: 0.82rem;
   }
 
   .westan-ranking-pill--points {
@@ -545,7 +583,9 @@ body[class*="dark"] .westan-ranking-shell {
     grid-row: 1;
     align-self: start;
     min-width: 58px;
-    min-height: 42px;
+    min-height: 40px;
+    padding: 6px 8px;
+    border-radius: 14px;
   }
 
   .westan-ranking-row + .westan-ranking-row {
@@ -554,16 +594,65 @@ body[class*="dark"] .westan-ranking-shell {
 
   .westan-ranking-user {
     grid-column: 2;
+    grid-row: 1;
     min-width: 0;
+    gap: 10px;
+  }
+
+  .westan-ranking-avatar img {
+    width: 46px;
+    height: 46px;
+  }
+
+  .westan-ranking-avatar span {
+    width: 20px;
+    height: 20px;
+  }
+
+  .westan-ranking-user strong {
+    font-size: 0.92rem;
+    line-height: 1.1;
+  }
+
+  .westan-ranking-user em {
+    font-size: 0.78rem;
   }
 
   .westan-ranking-pill {
-    min-height: 42px;
+    min-height: 40px;
+    border-radius: 14px;
   }
 
   .westan-ranking-pill:not(.westan-ranking-pill--points) {
-    min-height: 40px;
+    min-height: 42px;
     padding: 7px 8px;
+  }
+
+  .westan-ranking-row > .westan-ranking-pill:not(.westan-ranking-pill--points) {
+    grid-row: 2;
+  }
+
+  .westan-ranking-row > .westan-ranking-pill:nth-of-type(3) {
+    grid-column: 1;
+  }
+
+  .westan-ranking-row > .westan-ranking-pill:nth-of-type(4) {
+    grid-column: 2;
+  }
+
+  .westan-ranking-pill--vip {
+    grid-column: 3;
+  }
+
+  .westan-ranking-pill strong,
+  .westan-ranking-pill--points strong {
+    font-size: 0.86rem;
+  }
+
+  .westan-ranking-pill small,
+  .westan-ranking-pill--points small {
+    font-size: 0.48rem;
+    letter-spacing: 0.1em;
   }
 
   .westan-ranking-settings__grid,
