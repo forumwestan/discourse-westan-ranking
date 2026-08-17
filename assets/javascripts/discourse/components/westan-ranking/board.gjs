@@ -1,17 +1,26 @@
 import Component from "@glimmer/component";
-import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
-import { service } from "@ember/service";
 import { on } from "@ember/modifier";
-import { ajax } from "discourse/lib/ajax";
+import { service } from "@ember/service";
+import { tracked } from "@glimmer/tracking";
 import dIcon from "discourse/helpers/d-icon";
+import { ajax } from "discourse/lib/ajax";
 
 export default class WestanRankingBoard extends Component {
   @service currentUser;
 
-  @tracked rows = this.args.model.rows || [];
+  @tracked rankings =
+    this.args.model.rankings ||
+    {
+      weekly: {
+        rows: this.args.model.rows || [],
+        period: this.args.model.period || {},
+        current_user: null,
+      },
+      monthly: { rows: [], period: {}, current_user: null },
+    };
   @tracked config = this.args.model.config || {};
-  @tracked period = this.args.model.period || {};
+  @tracked activePeriod = "weekly";
   @tracked showInfo = false;
   @tracked showSettings = false;
   @tracked draft = { ...this.config };
@@ -23,19 +32,73 @@ export default class WestanRankingBoard extends Component {
     return this.currentUser?.admin || this.currentUser?.moderator;
   }
 
-  get excludedUserIds() {
-    return this.draft.excluded_user_ids || [];
+  get activeRanking() {
+    return this.rankings[this.activePeriod] || { rows: [], period: {} };
+  }
+
+  get activeRows() {
+    return this.activeRanking.rows || [];
   }
 
   get hasRows() {
-    return this.rows.length > 0;
+    return this.activeRows.length > 0;
   }
 
-  get displayRows() {
-    return this.rows.map((row, index) => ({
-      ...row,
-      is_winner: index === 0,
-    }));
+  get podiumRows() {
+    const rows = this.activeRows;
+    return [rows[1], rows[0], rows[2]]
+      .filter(Boolean)
+      .map((row) => ({
+        ...row,
+        is_winner: row.position === 1,
+        podium_class: `westan-ranking-podium__member is-position-${row.position}`,
+      }));
+  }
+
+  get listRows() {
+    return this.activeRows.slice(3);
+  }
+
+  get hasListRows() {
+    return this.listRows.length > 0;
+  }
+
+  get currentUserRank() {
+    return this.activeRanking.current_user;
+  }
+
+  get title() {
+    return this.activePeriod === "weekly" ? "Ranking Semanal" : "Ranking Mensal";
+  }
+
+  get periodLabel() {
+    return this.activeRanking.period?.label || "Período atual";
+  }
+
+  get updateLabel() {
+    return this.activePeriod === "weekly"
+      ? "Atualiza às segundas-feiras"
+      : "Acompanha o mês atual";
+  }
+
+  get weeklyTabClass() {
+    return this.activePeriod === "weekly" ? "is-active" : "";
+  }
+
+  get isWeekly() {
+    return this.activePeriod === "weekly";
+  }
+
+  get monthlyTabClass() {
+    return this.activePeriod === "monthly" ? "is-active" : "";
+  }
+
+  get isMonthly() {
+    return this.activePeriod === "monthly";
+  }
+
+  get excludedUserIds() {
+    return this.draft.excluded_user_ids || [];
   }
 
   get userResultRows() {
@@ -58,8 +121,16 @@ export default class WestanRankingBoard extends Component {
   }
 
   @action
+  selectPeriod(event) {
+    this.activePeriod = event.currentTarget.dataset.period;
+  }
+
+  @action
   openSettings() {
-    this.draft = { ...this.config, excluded_user_ids: [...(this.config.excluded_user_ids || [])] };
+    this.draft = {
+      ...this.config,
+      excluded_user_ids: [...(this.config.excluded_user_ids || [])],
+    };
     this.userSearch = "";
     this.userResults = [];
     this.showSettings = true;
@@ -140,121 +211,172 @@ export default class WestanRankingBoard extends Component {
       data: this.draft,
     });
     const refreshed = await ajax("/westan/ranking");
-    this.rows = refreshed.rows || [];
+    this.rankings = refreshed.rankings || this.rankings;
     this.config = refreshed.config || {};
-    this.period = refreshed.period || {};
     this.isSaving = false;
     this.showSettings = false;
   }
 
   <template>
-    <section class="westan-ranking-hero">
-      <p>Ranking Semanal</p>
+    <header class="westan-ranking-hero">
       <div class="westan-ranking-hero__topline">
-        <h1>Usuários mais engajados da comunidade</h1>
+        <div>
+          <p>Ranking Westan</p>
+          <h1>{{this.title}}</h1>
+        </div>
         <div class="westan-ranking-hero__actions">
           {{#if this.canManage}}
             <button type="button" class="westan-ranking-icon-button" aria-label="Configurações do ranking" {{on "click" this.openSettings}}>
               {{dIcon "gear"}}
             </button>
           {{/if}}
-          <button type="button" class="westan-ranking-icon-button westan-ranking-icon-button--accent" aria-label="Ver detalhes do ranking" {{on "click" this.openInfo}}>
+          <button type="button" class="westan-ranking-icon-button westan-ranking-icon-button--accent" aria-label="Entenda como funciona o ranking" {{on "click" this.openInfo}}>
             {{dIcon "circle-info"}}
           </button>
         </div>
       </div>
 
-      <div class="westan-ranking-hero__meta">
-        <span>{{dIcon "calendar-days"}} Semana válida: {{this.period.label}}</span>
-        <span>{{dIcon "wand-magic-sparkles"}} Atualiza às segundas-feiras</span>
+      <div class="westan-ranking-tabs" role="tablist" aria-label="Período do ranking">
+        <button
+          type="button"
+          class={{this.weeklyTabClass}}
+          data-period="weekly"
+          role="tab"
+          aria-selected={{this.isWeekly}}
+          {{on "click" this.selectPeriod}}
+        >
+          Semanal
+        </button>
+        <button
+          type="button"
+          class={{this.monthlyTabClass}}
+          data-period="monthly"
+          role="tab"
+          aria-selected={{this.isMonthly}}
+          {{on "click" this.selectPeriod}}
+        >
+          Mensal
+        </button>
       </div>
-    </section>
 
-    <section class="westan-ranking-table" aria-label="Ranking Semanal">
-      <div class="westan-ranking-table__head">
-        <span>Posição</span>
-        <span>Usuário</span>
-        <span>Posts</span>
-        <span>Tópicos</span>
-        <span>VIP</span>
-        <span>Pontos</span>
-      </div>
+    </header>
 
-      {{#if this.hasRows}}
-        {{#each this.displayRows as |row|}}
-          <article class="westan-ranking-row">
-            <div class="westan-ranking-position">#{{row.position}}</div>
-            <div class="westan-ranking-user">
-              <div class="westan-ranking-avatar">
-                <img src={{row.avatar_url}} alt={{row.display_name}} />
-                {{#if row.is_winner}}
-                  <span>{{dIcon "crown"}}</span>
-                {{/if}}
-              </div>
-              <div>
-                <strong>{{row.display_name}}</strong>
-                <em>@{{row.username}}</em>
-              </div>
+    {{#if this.hasRows}}
+      <section class="westan-ranking-podium" aria-label="Top 3 do ranking">
+        {{#each this.podiumRows as |row|}}
+          <article class={{row.podium_class}}>
+            <div class="westan-ranking-podium__avatar">
+              {{#if row.is_winner}}
+                <span class="westan-ranking-podium__crown" aria-hidden="true">
+                  <svg viewBox="0 0 256 256" focusable="false">
+                    <path d="M246.46 73.17a16 16 0 0 0-17.74-2.26l-46.9 23.38l-40-66.49a16.11 16.11 0 0 0-27.6 0l-40 66.49l-46.91-23.37A16.1 16.1 0 0 0 4.82 90.35l37 113.35a12 12 0 0 0 17.51 6.61C59.57 210.17 84.39 196 128 196s68.43 14.19 68.62 14.3a12 12 0 0 0 17.57-6.58l37-113.29a16 16 0 0 0-4.73-17.26Zm-50.93 110.35C182.18 178.4 159.2 172 128 172s-54.18 6.42-67.53 11.54l-27-82.71L70 119a16.19 16.19 0 0 0 21-6.11l37-61.49l37 61.5a16.18 16.18 0 0 0 21 6.1l36.52-18.2Z" />
+                  </svg>
+                </span>
+              {{/if}}
+              <img src={{row.avatar_url}} alt={{row.display_name}} />
+              <span class="westan-ranking-podium__position">{{row.position}}</span>
             </div>
-            <div class="westan-ranking-pill">{{row.posts_count}}</div>
-            <div class="westan-ranking-pill">{{row.topics_count}}</div>
-            <div class="westan-ranking-pill westan-ranking-pill--vip">
-              <strong>x{{row.vip_multiplier}}</strong>
-              <small>{{if row.is_vip "VIP ativo" "Padrão"}}</small>
-            </div>
-            <div class="westan-ranking-pill westan-ranking-pill--points">
-              <strong>{{row.total_points}}</strong>
-              <small>{{row.base_points}} base</small>
-            </div>
-            <div class="westan-ranking-mobile-metrics">
-              <div>
-                <strong>{{row.posts_count}}</strong>
-                <small>Posts</small>
-              </div>
-              <div>
-                <strong>{{row.topics_count}}</strong>
-                <small>Tópicos</small>
-              </div>
-              <div class="is-vip">
-                <strong>x{{row.vip_multiplier}}</strong>
-                <small>{{if row.is_vip "VIP ativo" "Padrão"}}</small>
-              </div>
+            <strong>{{row.display_name}}</strong>
+            <em>@{{row.username}}</em>
+            <div class="westan-ranking-podium__score">
+              <span>{{row.total_points}}</span> pontos
             </div>
           </article>
         {{/each}}
-      {{else}}
-        <div class="westan-ranking-empty">Ainda não há membros para exibir no ranking.</div>
+      </section>
+
+      <div class="westan-ranking-hero__meta">
+        <span>{{dIcon "calendar-days"}} {{this.periodLabel}}</span>
+        <span>{{dIcon "wand-magic-sparkles"}} {{this.updateLabel}}</span>
+      </div>
+
+      <section class="westan-ranking-current" aria-label="Sua posição no ranking">
+        {{#if this.currentUserRank}}
+          <div class="westan-ranking-current__user">
+            <img src={{this.currentUserRank.avatar_url}} alt={{this.currentUserRank.display_name}} />
+            <div>
+              <span>Sua posição</span>
+              <strong>{{this.currentUserRank.display_name}}</strong>
+            </div>
+          </div>
+          <b>#{{this.currentUserRank.position}}</b>
+          <div class="westan-ranking-current__points">
+            <strong>{{this.currentUserRank.total_points}}</strong>
+            <span>pontos</span>
+          </div>
+        {{else if this.currentUser}}
+          <div class="westan-ranking-current__empty">
+            <span>Sua posição</span>
+            <strong>Você ainda não pontuou neste período.</strong>
+          </div>
+        {{else}}
+          <div class="westan-ranking-current__empty">
+            <span>Sua posição</span>
+            <strong>Entre para acompanhar seu desempenho.</strong>
+          </div>
+          <a href="/login">Entrar</a>
+        {{/if}}
+      </section>
+
+      {{#if this.hasListRows}}
+        <section class="westan-ranking-list" aria-label="Demais posições do ranking">
+          <header>
+            <h2>Demais posições</h2>
+            <span>Top 20</span>
+          </header>
+          {{#each this.listRows as |row|}}
+            <article class="westan-ranking-list__row">
+              <b>#{{row.position}}</b>
+              <img src={{row.avatar_url}} alt={{row.display_name}} />
+              <div class="westan-ranking-list__user">
+                <strong>{{row.display_name}}</strong>
+                <span>@{{row.username}}</span>
+              </div>
+              <div class="westan-ranking-list__activity">
+                <span><strong>{{row.posts_count}}</strong> posts</span>
+                <span><strong>{{row.topics_count}}</strong> tópicos</span>
+              </div>
+              <div class="westan-ranking-list__points">
+                <strong>{{row.total_points}}</strong>
+                <span>pontos</span>
+              </div>
+            </article>
+          {{/each}}
+        </section>
       {{/if}}
-    </section>
+    {{else}}
+      <div class="westan-ranking-empty">Ainda não há membros para exibir neste período.</div>
+    {{/if}}
 
     {{#if this.showInfo}}
-      <div class="westan-ranking-modal" role="dialog" aria-modal="true">
+      <div class="westan-ranking-modal" role="dialog" aria-modal="true" aria-labelledby="westan-ranking-info-title">
         <button type="button" class="westan-ranking-modal__backdrop" aria-label="Fechar" {{on "click" this.closeInfo}}></button>
         <div class="westan-ranking-modal__panel westan-ranking-info">
           <button type="button" class="westan-ranking-modal__close" aria-label="Fechar" {{on "click" this.closeInfo}}>
             {{dIcon "xmark"}}
           </button>
-          <p>Ranking Semanal</p>
-          <h2>Como a pontuação funciona</h2>
+          <p>Ranking Westan</p>
+          <h2 id="westan-ranking-info-title">Como a pontuação funciona</h2>
           <div>
-            O ranking é renovado automaticamente toda segunda-feira e considera todos os membros do fórum na semana anterior.
+            O ranking semanal considera a última semana completa e é renovado às segundas-feiras. O ranking mensal acompanha a participação no mês atual.
             A pontuação usa <strong>1 post = {{this.pointsPerPost}} ponto</strong> e
             <strong>1 tópico = {{this.pointsPerTopic}} pontos</strong>.
-            O status VIP dobra a pontuação final (multiplicador <strong>x{{this.vipMultiplierCap}}</strong>).
+            Membros do grupo VIP recebem multiplicador de até <strong>x{{this.vipMultiplierCap}}</strong>.
           </div>
         </div>
       </div>
     {{/if}}
 
     {{#if this.showSettings}}
-      <div class="westan-ranking-modal" role="dialog" aria-modal="true">
+      <div class="westan-ranking-modal" role="dialog" aria-modal="true" aria-labelledby="westan-ranking-settings-title">
         <button type="button" class="westan-ranking-modal__backdrop" aria-label="Fechar" {{on "click" this.closeSettings}}></button>
         <div class="westan-ranking-modal__panel westan-ranking-settings">
           <button type="button" class="westan-ranking-modal__close" aria-label="Fechar" {{on "click" this.closeSettings}}>
             {{dIcon "xmark"}}
           </button>
-          <h2>Configurações do Ranking</h2>
+          <h2 id="westan-ranking-settings-title">Configurações do Ranking</h2>
 
+          <p class="westan-ranking-settings__hint">O período personalizado abaixo afeta somente o ranking semanal.</p>
           <div class="westan-ranking-settings__grid">
             <label>
               <span>Início</span>

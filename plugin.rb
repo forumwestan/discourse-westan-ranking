@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # name: discourse-westan-ranking
-# about: Weekly engagement ranking for Discourse communities
+# about: Weekly and monthly engagement rankings for Discourse communities
 # meta_topic_id: 0
 # version: 0.1.0
 # authors: Westan
