@@ -972,15 +972,16 @@
   }
 }
 
-/* Theme adaptation. Light is the default; Discourse dark schemes switch the
-   same layout automatically without requiring a separate theme component. */
+/* Follow Discourse's active color palette. Horizon swaps these variables when
+   the user changes color scheme, so the ranking updates without relying on a
+   theme-specific `dark` class. */
 .westan-ranking-shell {
-  --ranking-bg: #ffffff;
-  --ranking-surface: #ffffff;
-  --ranking-surface-strong: #f6f2fa;
-  --ranking-line: rgba(32, 20, 48, 0.11);
-  --ranking-text: #17111f;
-  --ranking-muted: #766d82;
+  --ranking-bg: var(--secondary);
+  --ranking-surface: var(--secondary);
+  --ranking-surface-strong: var(--primary-very-low);
+  --ranking-line: var(--primary-low);
+  --ranking-text: var(--primary);
+  --ranking-muted: var(--primary-medium);
   --ranking-gold: #c88a00;
 
   border-color: transparent;
@@ -1003,24 +1004,24 @@
   .westan-ranking-icon-button {
     border-color: var(--ranking-line);
     background: var(--ranking-surface-strong);
-    color: #72677f;
+    color: var(--ranking-muted);
 
     &:hover {
       border-color: rgba(154, 60, 255, 0.38);
-      background: #f1e8fa;
-      color: #4f276f;
+      background: color-mix(in srgb, var(--ranking-purple) 12%, var(--ranking-surface));
+      color: var(--ranking-text);
     }
   }
 
   .westan-ranking-icon-button--accent {
     border-color: rgba(154, 60, 255, 0.2);
-    background: #f5ebff;
-    color: #8a2ce0;
+    background: color-mix(in srgb, var(--ranking-purple) 10%, var(--ranking-surface));
+    color: var(--ranking-purple);
   }
 
   .westan-ranking-tabs {
     border-color: var(--ranking-line);
-    background: #f5f1f8;
+    background: var(--ranking-surface-strong);
   }
 
   .westan-ranking-tabs button:hover {
@@ -1028,7 +1029,7 @@
   }
 
   .westan-ranking-podium__avatar img {
-    background: #f3edf8;
+    background: var(--ranking-surface-strong);
   }
 
   .westan-ranking-podium__position {
@@ -1046,7 +1047,7 @@
   .westan-ranking-empty {
     border-color: var(--ranking-line);
     background: var(--ranking-surface);
-    box-shadow: 0 14px 38px rgba(46, 25, 64, 0.06);
+    box-shadow: 0 14px 38px color-mix(in srgb, var(--primary) 6%, transparent);
   }
 
   .westan-ranking-list > header,
@@ -1059,7 +1060,7 @@
   }
 
   .westan-ranking-list__row > b {
-    color: #675d73;
+    color: var(--ranking-muted);
   }
 
   .westan-ranking-modal {
@@ -1068,7 +1069,7 @@
 
   .westan-ranking-modal__panel {
     border-color: var(--ranking-line);
-    background: #fff;
+    background: var(--ranking-surface);
     box-shadow: 0 28px 85px rgba(22, 10, 35, 0.22);
   }
 
@@ -1081,10 +1082,6 @@
     color: var(--ranking-text);
   }
 
-  .westan-ranking-settings input {
-    color-scheme: light;
-  }
-
   .westan-ranking-info > div,
   .westan-ranking-settings label > span,
   .westan-ranking-settings__users em {
@@ -1095,91 +1092,5 @@
     border-color: transparent;
     background: linear-gradient(110deg, var(--ranking-magenta), var(--ranking-purple));
     color: #fff;
-  }
-}
-
-html.dark .westan-ranking-shell,
-html.dark-scheme .westan-ranking-shell,
-html[class*="dark"] .westan-ranking-shell,
-html[data-color-scheme="dark"] .westan-ranking-shell,
-body.dark .westan-ranking-shell,
-body[class*="dark"] .westan-ranking-shell,
-.dark-scheme .westan-ranking-shell,
-.discourse-dark-mode .westan-ranking-shell,
-[data-color-scheme="dark"] .westan-ranking-shell,
-[data-theme*="dark"] .westan-ranking-shell,
-.preview-dark .westan-ranking-shell {
-  --ranking-bg: #0d061d;
-  --ranking-surface: #17102a;
-  --ranking-surface-strong: #22173a;
-  --ranking-line: rgba(255, 255, 255, 0.1);
-  --ranking-text: #ffffff;
-  --ranking-muted: #aa9fbd;
-  --ranking-gold: #ffd633;
-
-  border-color: rgba(154, 60, 255, 0.2);
-  background: var(--ranking-bg);
-  box-shadow: 0 24px 70px rgba(13, 6, 29, 0.22);
-
-  .westan-ranking-icon-button {
-    border-color: var(--ranking-line);
-    background: rgba(255, 255, 255, 0.07);
-    color: #cfc5de;
-
-    &:hover {
-      border-color: rgba(196, 125, 255, 0.55);
-      background: rgba(154, 60, 255, 0.18);
-      color: #fff;
-    }
-  }
-
-  .westan-ranking-icon-button--accent {
-    border-color: rgba(154, 60, 255, 0.38);
-    background: rgba(154, 60, 255, 0.14);
-    color: #dbaeff;
-  }
-
-  .westan-ranking-tabs {
-    border-color: var(--ranking-line);
-    background: rgba(255, 255, 255, 0.045);
-  }
-
-  .westan-ranking-podium__avatar img {
-    background: #24183a;
-  }
-
-  .westan-ranking-podium__score,
-  .westan-ranking-list__activity > span {
-    border-color: rgba(255, 255, 255, 0.06);
-    background: rgba(255, 255, 255, 0.07);
-  }
-
-  .westan-ranking-list,
-  .westan-ranking-empty {
-    background: rgba(255, 255, 255, 0.035);
-    box-shadow: none;
-  }
-
-  .westan-ranking-list__row > b {
-    color: #d8cde8;
-  }
-
-  .westan-ranking-modal__panel {
-    border-color: rgba(255, 255, 255, 0.13);
-    background: #17102a;
-    box-shadow: 0 28px 85px rgba(5, 2, 13, 0.55);
-  }
-
-  .westan-ranking-modal__close,
-  .westan-ranking-settings input,
-  .westan-ranking-settings__users > div,
-  .westan-ranking-settings footer button {
-    border-color: var(--ranking-line);
-    background: rgba(255, 255, 255, 0.06);
-    color: #fff;
-  }
-
-  .westan-ranking-settings input {
-    color-scheme: dark;
   }
 }
